@@ -29,11 +29,12 @@ module Eat
     # * <tt>:timeout</tt> in seconds
     # * <tt>:limit</tt> is characters (bytes in Ruby 1.8)
     # * <tt>:openssl_verify_mode</tt> set to 'none' if you don't want to verify SSL certificates
-    #
+    # * <tt>:ua</tt> sets user agent's string
     # Example:
     #    eat('http://brighterplanet.com')                 #=> '...'
     #    eat('http://brighterplanet.com', :timeout => 10) #=> '...'
     #    eat('http://brighterplanet.com', :limit => 1)    #=> '.'
+    #    eat('http://brighterplanet.com', :ua => 'Mozilla')    #=> '.'
     def eat(url, options = {})
       limit = options.fetch(:limit, INFINITY)
       
@@ -57,11 +58,12 @@ module Eat
       when 'http', 'https'
         timeout = options.fetch(:timeout, TIMEOUT)
         openssl_verify_mode = options.fetch(:openssl_verify_mode, ::OpenSSL::SSL::VERIFY_PEER)
+        ua = options.fetch(:ua, AGENT_NAME)
         if openssl_verify_mode == 'none'
           openssl_verify_mode = ::OpenSSL::SSL::VERIFY_NONE
         end
         http = ::HTTPClient.new
-        http.agent_name = AGENT_NAME
+        http.agent_name = ua
         http.redirect_uri_callback = REDIRECT_HANDLER
         http.transparent_gzip_decompression = true
         http.receive_timeout = timeout
